@@ -1,0 +1,82 @@
+body { 
+    font-family: 'Inter', sans-serif; 
+    background-color: #2b2b2b;
+}
+
+/* Custom CSS for Flow Diagram (No SVG) */
+.flow-node {
+    transition: all 0.3s ease;
+    border: 2px solid #e7e5e4; /* stone-200 */
+}
+.flow-node.active {
+    border-color: #d97706; /* amber-600 */
+    background-color: #fffbeb; /* amber-50 */
+    box-shadow: 0 4px 6px -1px rgba(217, 119, 6, 0.1);
+    transform: scale(1.02);
+}
+.flow-node.completed {
+    border-color: #22c55e; /* green-500 */
+    color: #15803d;
+}
+.flow-line {
+    height: 2px;
+    background-color: #e7e5e4;
+    flex-grow: 1;
+    transition: background-color 0.3s ease;
+}
+.flow-line.active {
+    background-color: #d97706;
+}
+
+/* Chat Specific Styling */
+.chat-container {
+    height: 70vh; /* Fixed height for chat window */
+    min-height: 400px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    border: 1px solid #e7e5e4;
+}
+.bot-message {
+    background-color: #ffffff;
+    border-top-left-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+}
+.user-message {
+    background-color: #fcd34d; /* amber-300 */
+    border-top-right-radius: 0.75rem;
+    border-bottom-left-radius: 0.75rem;
+}
+
+/* Chart Container Styling - Mandatory */
+.chart-container {
+    position: relative;
+    width: 100%;
+    max-width: 400px; 
+    margin-left: auto;
+    margin-right: auto;
+    height: 250px;
+    max-height: 300px;
+}
+
+/* Modal for LLM response */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
+}
+.modal-content {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    max-width: 90%;
+    max-height: 90%;
+    overflow-y: auto;
+}
