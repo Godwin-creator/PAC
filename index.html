@@ -1,155 +1,142 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detector : Assistant de Diagnostic</title>
-    <link rel="stylesheet" href="style.css">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>PAC — Power Assistant Checker</title>
+    <link rel="icon" href="assets/icons/favicon.png">
+    <meta name="theme-color" content="#81d4fa" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Warm Neutrals (Stone) with Amber Accents. 
-         Background: bg-stone-50. Text: text-stone-800. 
-         Primary Action: amber-600. Success: green-600. 
-         Rationale: "Calm harmony" for a stressful situation (broken PC). -->
-</head>
-<body class="bg-stone-50 text-stone-800 min-h-screen flex flex-col">
-
-    <!-- Modal for LLM Responses (Text/Search) -->
-    <div id="llm-modal" class="modal">
-        <div class="modal-content w-full lg:max-w-xl">
-            <div class="flex justify-between items-center mb-4 border-b pb-2">
-                <h3 id="modal-title" class="text-xl font-bold text-stone-800">Réponse de l'IA</h3>
-                <button onclick="document.getElementById('llm-modal').style.display = 'none'" class="text-stone-500 hover:text-stone-800 font-bold text-2xl">
-                    &times;
-                </button>
-            </div>
-            <div id="modal-content-text" class="text-stone-700 space-y-4">
-                <p>Chargement...</p>
-            </div>
+    <link rel="stylesheet" href="style.css">
+    <style>
+      :root{--primary:#0ea5e9;--primary-dark:#0284c7;--secondary:#ffffff;--tertiary:#0f172a}
+      body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial}
+      .hero-bg{background:linear-gradient(135deg, rgba(14,165,233,0.08), rgba(2,132,199,0.03));}
+      .card-glass{background:rgba(255,255,255,0.92);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+    </style>
+  </head>
+  <body class="bg-gray-50 text-[color:var(--tertiary)]">
+    <header class="w-full border-b border-gray-200 bg-white/80">
+      <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <img src="assets/icons/favicon.png" alt="PAC logo" width="48" height="48" class="rounded">
+          <div>
+            <div class="font-semibold text-lg">PAC</div>
+            <div class="text-xs text-gray-500">Power Assistant Checker</div>
+          </div>
         </div>
-    </div>
-    
-    <!-- Audio Element to Play TTS -->
-    <audio id="tts-audio" style="display: none;"></audio>
-
-    <!-- Header -->
-    <header id="header" class="bg-white border-b border-stone-200 py-4 px-6 shadow-sm flex justify-between items-center sticky top-0 z-10">
-        <div class="flex items-center gap-2">
-            <span class="text-2xl">🤖</span>
-            <h1 class="text-xl font-bold tracking-tight text-stone-700">Detector Chatbot Diagnostic</h1>
-        </div>
-        <button id="theme" class="text-sm text-stone-500 hover:text-amber-600 transition-colors">↺ Théme</button>
-        <button onclick="app.reset()" class="text-sm text-stone-500 hover:text-amber-600 transition-colors">
-            ↺ Recommencer
-        </button>
+        <nav class="flex items-center gap-4">
+          <a href="#features" class="text-sm text-gray-600 hover:text-black">Fonctionnalités</a>
+          <a href="#how" class="text-sm text-gray-600 hover:text-black">Comment ça marche</a>
+          <a href="chatbot.html" class="ml-4 inline-flex items-center px-4 py-2 bg-[color:var(--primary)] hover:bg-[color:var(--primary-dark)] text-white rounded-lg shadow">Commencer</a>
+        </nav>
+      </div>
     </header>
 
-    <main class="flex-grow container mx-auto px-4 py-8 max-w-6xl">
-        
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
-            
-            <!-- LEFT COLUMN: Chatbot Interface -->
-            <div class="lg:col-span-7 flex flex-col gap-4">
-                
-                <!-- Chat Window (Message History) -->
-                <div id="chat-window" class="chat-container bg-stone-100 rounded-xl shadow-inner p-4 flex flex-col gap-4">
-                    <!-- Messages will be injected here -->
-                </div>
+    <main class="hero-bg py-12">
+      <div class="max-w-6xl mx-auto px-6">
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div>
+            <h1 class="text-3xl md:text-4xl font-extrabold mb-4">PAC — Power Assistant Checker</h1>
+            <p class="text-gray-700 mb-6">PAC est un chatbot intelligent conçu pour diagnostiquer et résoudre les problèmes d’alimentation sur les ordinateurs de bureau et les PC portables. Identifiez rapidement les pannes courantes liées à l’alimentation et obtenez des solutions adaptées à votre situation.</p>
 
-                <!-- Input/Action Area -->
-                <div id="action-area" class="bg-white rounded-xl shadow-lg p-4 border border-stone-200">
-                    <p id="action-prompt" class="text-sm text-stone-600 mb-2">Veuillez choisir une option pour continuer...</p>
-                    <div id="response-buttons" class="flex flex-wrap gap-2">
-                        <!-- Buttons injected here -->
-                        <div class="animate-pulse h-8 bg-stone-200 rounded w-1/4"></div>
-                        <div class="animate-pulse h-8 bg-stone-200 rounded w-1/5"></div>
-                    </div>
-                </div>
-
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+              <div class="card-glass p-4 rounded-lg border border-gray-100 shadow-sm">
+                <h3 class="font-semibold">Diagnostic rapide</h3>
+                <p class="text-sm text-gray-600 mt-1">Détection des problèmes en quelques questions.</p>
+              </div>
+              <div class="card-glass p-4 rounded-lg border border-gray-100 shadow-sm">
+                <h3 class="font-semibold">Solutions personnalisées</h3>
+                <p class="text-sm text-gray-600 mt-1">Conseils pratiques et étapes pour résoudre le problème.</p>
+              </div>
             </div>
 
-            <!-- RIGHT COLUMN: Visualization & Context -->
-            <div class="lg:col-span-5 flex flex-col gap-6">
-                
-                <!-- System Diagram (Contextual Map) -->
-                <div id="etape-area" class="bg-white rounded-xl shadow-sm p-6 border border-stone-100">
-                    <h3 class="text-sm font-bold text-stone-500 uppercase tracking-wider mb-4">Localisation de la Panne</h3>
-                    <p class="text-xs text-stone-400 mb-4">Ce schéma met en évidence la zone actuellement testée dans la chaîne d'alimentation.</p>
-                    
-                    <!-- HTML/CSS Diagram - NO SVG -->
-                    <div  class="flex flex-col gap-2 relative">
-                        <!-- Node 1: Source -->
-                        <div id="node-source" class="flow-node p-3 rounded-lg flex items-center gap-3">
-                            <span class="text-xl">⚡</span>
-                            <div>
-                                <div class="font-semibold text-sm">Source Électrique</div>
-                                <div class="text-xs text-stone-500">Prise Murale / Tableau</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Connector -->
-                        <div class="h-6 w-0.5 bg-stone-200 mx-6 self-start ml-8 flow-line" id="line-1"></div>
+            <a href="chatbot.html" class="inline-flex items-center gap-3 px-6 py-3 bg-[color:var(--primary)] hover:bg-[color:var(--primary-dark)] text-white font-semibold rounded-lg shadow-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zM9 7h2v5H9V7zm0 6h2v2H9v-2z"/></svg>
+              Commencer avec PAC
+            </a>
 
-                        <!-- Node 2: Cable -->
-                        <div id="node-cable" class="flow-node p-3 rounded-lg flex items-center gap-3">
-                            <span class="text-xl">🔌</span>
-                            <div>
-                                <div class="font-semibold text-sm">Câblage</div>
-                                <div class="text-xs text-stone-500">Cordon / Interrupteur I/O</div>
-                            </div>
-                        </div>
-
-                        <!-- Connector -->
-                        <div class="h-6 w-0.5 bg-stone-200 mx-6 self-start ml-8 flow-line" id="line-2"></div>
-
-                        <!-- Node 3: Machine -->
-                        <div id="node-machine" class="flow-node p-3 rounded-lg flex items-center gap-3">
-                            <span class="text-xl">💻</span>
-                            <div>
-                                <div class="font-semibold text-sm">Machine</div>
-                                <div class="text-xs text-stone-500">Bouton Power / Batterie</div>
-                            </div>
-                        </div>
-
-                        <!-- Connector -->
-                        <div class="h-6 w-0.5 bg-stone-200 mx-6 self-start ml-8 flow-line" id="line-3"></div>
-
-                        <!-- Node 4: Internal -->
-                        <div id="node-internal" class="flow-node p-3 rounded-lg flex items-center gap-3">
-                            <span class="text-xl">⚙️</span>
-                            <div>
-                                <div class="font-semibold text-sm">Composants Internes</div>
-                                <div class="text-xs text-stone-500">Carte Mère / Alimentation</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Stats / Progress Section -->
-                <div id="progress-area" class="bg-white rounded-xl shadow-sm p-6 border border-stone-100 flex-grow flex flex-col">
-                    <h3 class="text-sm font-bold text-stone-500 uppercase tracking-wider mb-2">Progression du Diagnostic</h3>
-                    <p class="text-xs text-stone-400 mb-4">Avancement à travers l'arbre de décision.</p>
-                    
-                    <div class="flex-grow flex items-center justify-center">
-                        <div class="chart-container">
-                            <canvas id="progressChart"></canvas>
-                        </div>
-                    </div>
-                    
-                    <div id="probability-container" class="hidden mt-6 pt-6 border-t border-stone-100">
-                        <h3 class="text-sm font-bold text-stone-500 uppercase tracking-wider mb-2">Suspects Probables</h3>
-                        <p class="text-xs text-stone-400 mb-2">Basé sur l'absence de réponse aux tests précédents.</p>
-                        <div class="chart-container">
-                            <canvas id="probabilityChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
+            <div id="how" class="mt-8">
+              <h2 class="text-xl font-semibold mb-3">Comment ça marche ?</h2>
+              <ol class="list-decimal ml-6 text-gray-700">
+                <li>Répondez à quelques questions sur votre problème.</li>
+                <li>PAC analyse les informations et propose un diagnostic.</li>
+                <li>Suivez les étapes de dépannage ou obtenez des recommandations de réparation.</li>
+              </ol>
             </div>
-        </div>
+          </div>
+
+          <div class="flex items-center justify-center">
+            <div class="w-full max-w-md card-glass rounded-2xl p-6 shadow-lg border border-gray-100">
+              <img src="assets/icons/pac-robot.png" alt="PAC robot" class="mx-auto mb-4 w-64 h-64 object-contain" onerror="this.onerror=null;this.src='assets/icons/favicon.png'">
+              <h3 class="text-center font-bold text-lg">PAC — Votre assistant d’alimentation</h3>
+              <p class="text-center text-gray-600 text-sm mt-2">Obtenez un diagnostic clair et des étapes pratiques pour réparer ou prévenir les pannes d'alimentation.</p>
+              <div class="mt-4 flex justify-center">
+                <a href="chatbot.html" class="px-4 py-2 bg-[color:var(--primary)] hover:bg-[color:var(--primary-dark)] text-white rounded-md font-medium">Lancer le diagnostic</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="features" class="mt-12">
+          <h2 class="text-2xl font-semibold mb-6">Fonctionnalités principales</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="p-6 bg-white rounded-lg shadow-sm border border-gray-100">
+              <h4 class="font-semibold">Diagnostic rapide</h4>
+              <p class="text-sm text-gray-600 mt-1">Détection des problèmes d’alimentation en quelques questions.</p>
+            </div>
+            <div class="p-6 bg-white rounded-lg shadow-sm border border-gray-100">
+              <h4 class="font-semibold">Solutions personnalisées</h4>
+              <p class="text-sm text-gray-600 mt-1">Conseils pratiques et étapes à suivre pour résoudre le problème.</p>
+            </div>
+            <div class="p-6 bg-white rounded-lg shadow-sm border border-gray-100">
+              <h4 class="font-semibold">Guide de dépannage</h4>
+              <p class="text-sm text-gray-600 mt-1">Informations sur la carte mère, l'alimentation, la batterie, etc.</p>
+            </div>
+            <div class="p-6 bg-white rounded-lg shadow-sm border border-gray-100">
+              <h4 class="font-semibold">Prédiagnostic</h4>
+              <p class="text-sm text-gray-600 mt-1">Évaluation pour anticiper les pannes potentielles.</p>
+            </div>
+          </div>
+        </section>
+      </div>
     </main>
-</body>
-<script src="config.js"></script>
-<script src="script.js"></script>
+
+    <footer class="bg-white border-t border-gray-200 mt-12">
+      <div class="max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div>
+          <div class="flex items-center gap-3 mb-2">
+            <img src="assets/icons/favicon.png" alt="PAC" width="40" height="40">
+            <div>
+              <div class="font-semibold">PAC — Power Assistant Checker</div>
+              <div class="text-xs text-gray-500">Assistant de diagnostic d'alimentation</div>
+            </div>
+          </div>
+          <p class="text-sm text-gray-600">Besoin d'aide ? <a href="mailto:contact@pac.example" class="text-[color:var(--primary)]">contact@pac.example</a></p>
+        </div>
+
+        <div class="flex gap-8">
+          <div>
+            <h5 class="font-semibold">Produit</h5>
+            <ul class="text-sm text-gray-600 mt-2 space-y-1">
+              <li><a href="#features" class="hover:underline">Fonctionnalités</a></li>
+              <li><a href="#how" class="hover:underline">Comment ça marche</a></li>
+            </ul>
+          </div>
+          <div>
+            <h5 class="font-semibold">Entreprise</h5>
+            <ul class="text-sm text-gray-600 mt-2 space-y-1">
+              <li><a href="#" class="hover:underline">À propos</a></li>
+              <li><a href="#" class="hover:underline">Mentions légales</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="text-sm text-gray-500">© <span id="year"></span> PAC. Tous droits réservés.</div>
+      </div>
+    </footer>
+
+    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  </body>
 </html>
