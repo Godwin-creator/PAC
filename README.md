@@ -79,7 +79,9 @@ PAC/
 * Créer une branche dédiée avant tout ajout ou modification.
 * Soumettre une **pull request** claire et détaillée.
 * Respecter l’architecture du projet et documenter toute fonctionnalité ajoutée.
+---
 
+## Lancer un diagnostic : https://godwin-creator.github.io/PAC/
 ---
 
 ## **Licence**
@@ -93,4 +95,5 @@ Si aucune licence n’a encore été choisie, se référer au responsable du pro
 
 Pour toute question ou retour :
 **[contact@pac.personal](mailto:edohbedigodwin@gmail.com)**
+
 
