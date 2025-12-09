@@ -92,4 +92,5 @@ Si aucune licence n’a encore été choisie, se référer au responsable du pro
 ## **Contact**
 
 Pour toute question ou retour :
-**[contact@pac.example](mailto:contact@pac.example)**
+**[contact@pac.personal](mailto:edohbedigodwin@gmail.com)**
+
