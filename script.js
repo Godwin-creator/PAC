@@ -6,16 +6,78 @@ const MODEL_TEXT = 'gemini-2.5-flash-preview-09-2025';
 const MODEL_TTS = 'gemini-2.5-flash-preview-tts';
 console.log(apiKey);
 
-//Changement du thème
-// theme.onclick = () => {
-//     document.body.style.backgroundColor = "#2b2b2b";
-//     document.getElementById('header').style.backgroundColor = "#2b2b2b";
-//     document.getElementById('chat-window').style.backgroundColor = "#2b2b2b";
-//     document.getElementById('action-area').style.backgroundColor = "#2b2b2b";
-//     document.getElementById('etape-area').style.backgroundColor = "#2b2b2b";
-//     document.getElementById('progress-area').style.backgroundColor = "#2b2b2b";
-// };
+// Theme Management (Light/Dark Mode)
+const theme = document.getElementById('theme');
+let isDarkMode = false;
 
+const darkModeStyles = {
+    body: { backgroundColor: '#1f2937', color: '#f3f4f6' },
+    header: { backgroundColor: '#111827', color: '#f3f4f6' },
+    'chat-window': { backgroundColor: '#111827', color: '#f3f4f6' },
+    'action-area': { backgroundColor: '#1f2937' },
+    'etape-area': { backgroundColor: '#1f2937' },
+    'progress-area': { backgroundColor: '#1f2937' },
+};
+
+const lightModeStyles = {
+    body: { backgroundColor: '#fafaf8', color: '#292524' },
+    header: { backgroundColor: '#ffffff', color: '#292524' },
+    'chat-window': { backgroundColor: '#ffffff', color: '#292524' },
+    'action-area': { backgroundColor: '#fafaf8' },
+    'etape-area': { backgroundColor: '#fafaf8' },
+    'progress-area': { backgroundColor: '#fafaf8' },
+};
+
+function applyTheme(isDark) {
+    const styles = isDark ? darkModeStyles : lightModeStyles;
+    
+    Object.entries(styles).forEach(([elementId, styleObj]) => {
+        const element = elementId === 'body' ? document.body : document.getElementById(elementId);
+        if (element) {
+            Object.assign(element.style, styleObj);
+        }
+    });
+    
+    // Update text colors in chat messages
+    document.querySelectorAll('.bot-message').forEach(msg => {
+        msg.style.backgroundColor = isDark ? '#374151' : '#e7e5e4';
+        msg.style.color = isDark ? '#f3f4f6' : '#292524';
+    });
+    
+    document.querySelectorAll('.user-message').forEach(msg => {
+        msg.style.backgroundColor = isDark ? '#d97706' : '#fcd34d';
+        msg.style.color = isDark ? '#111827' : '#292524';
+    });
+    
+    // Update modal styles
+    const modal = document.getElementById('llm-modal');
+    if (modal) {
+        modal.style.backgroundColor = isDark ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.5)';
+    }
+    const modalContent = document.querySelector('.modal-content');
+    if (modalContent) {
+        modalContent.style.backgroundColor = isDark ? '#1f2937' : '#ffffff';
+        modalContent.style.color = isDark ? '#f3f4f6' : '#292524';
+    }
+}
+
+// Toggle theme on button click
+theme.addEventListener('click', () => {
+    isDarkMode = !isDarkMode;
+    applyTheme(isDarkMode);
+    theme.textContent = isDarkMode ? '☀️' : '🌙';
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+});
+
+// Load saved theme preference
+document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        isDarkMode = true;
+        applyTheme(true);
+        theme.textContent = '☀️';
+    }
+});
 
 // Utility for exponential backoff
 async function fetchWithBackoff(url, options, maxRetries = 5) {
@@ -106,13 +168,13 @@ const diagnosisData = {
     nodes: [
         {
             id: 'start',
-            title: "Bonjour, je suis Detector. Quel est le problème ?",
+            title: "Bonjour, je suis PAC. Quel est le problème ?",
             description: "Pour commencer le diagnostic, veuillez préciser le type de matériel concerné. Certaines étapes (comme la batterie) sont spécifiques aux ordinateurs portables. Quel est votre type d'ordinateur ?",
             actions: [],
             type: 'selection',
             targetNode: null,
             responses: [
-                { label: "PC Fixe (Tour)", value: 'desktop', next: 'branch1' },
+                { label: "DeskTop", value: 'desktop', next: 'branch1' },
                 { label: "PC Portable", value: 'laptop', next: 'branch1' }
             ]
         },
@@ -122,9 +184,10 @@ const diagnosisData = {
             description: "Le problème vient peut-être de la source d'énergie et non du PC. Cette étape permet d'éliminer les causes externes. Voici les actions à effectuer :",
             diagramFocus: 'node-source',
             actions: [
-                "Branchez une lampe ou un chargeur de téléphone sur la même prise murale.",
-                "Essayez de brancher le PC sur une prise dans une autre pièce.",
-                "Vérifiez qu'aucun disjoncteur n'a sauté au tableau électrique."
+                "Branchez une lampe ou charger un téléphone sur la même prise.",
+                "Essayez de brancher le PC sur une autre prise.",
+                "Vérifiez le disjoncteur du tableau électrique (voir si tout fonctionne).",
+                "Vérifiez que la borne d'alimentation est bien placée"
             ],
             question: "La lampe témoin s'allume-t-elle sur la prise murale ?",
             responses: [
@@ -235,7 +298,7 @@ const diagnosisData = {
             diagramFocus: 'node-internal',
             actions: [
                 "Regardez les LED de façade ou de clavier.",
-                "Écoutez le bruit des ventilateurs ou du disque dur lors de l'appui."
+                "Écoutez le bruit des ventilateurs (s'ils tournent) ou du disque dur lors de l'appui."
             ],
             question: "Observez-vous une lumière ou un son, même bref ?",
             responses: [
@@ -483,7 +546,7 @@ const app = {
         const isUser = sender === 'user';
         const messageClass = isUser ? 'user-message self-end' : 'bot-message self-start';
         const alignment = isUser ? 'items-end' : 'items-start';
-        const icon = isUser ? '👤' : '🤖';
+        const icon = isUser ? '👤' : '<img src="assets/icons/favicon.png" alt="PAC Logo" width="100px" height="220px">';
 
         const actionsHtml = isQuestion ? `<div class="mt-2 text-sm text-stone-700">${text}</div>` : `<p class="text-sm">${text}</p>`;
 
