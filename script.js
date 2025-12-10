@@ -1,6 +1,6 @@
 // --- Gemini API Configuration ---
 
-const apiKey = "AIzaSyD0b_IkJW29ezM5VMpAlsHa1kClVJtoiwc"; //Vous collerez votre clé api ic avant de lancer le programme.
+const apiKey = "AIzaSyCvxYDgAzhDFptzUSxHtkiYsKINCme_-pg"; //Vous collerez votre clé api ic avant de lancer le programme.
 const LLM_URL_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
 const MODEL_TEXT = 'gemini-2.5-flash-preview-09-2025';
 const MODEL_TTS = 'gemini-2.5-flash-preview-tts';
@@ -823,4 +823,5 @@ document.addEventListener('DOMContentLoaded', () => {
     app.init();
 
 });
+
 
